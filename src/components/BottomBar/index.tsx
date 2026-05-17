@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { Plus, Mic, ArrowUp, ImagePlus, FileText, Camera, X } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Plus, Mic, ArrowUp, ImagePlus, Camera, X } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAppStore } from '@store/appStore';
 import { useIntentSearch } from '@hooks/useIntentSearch';
 
@@ -137,63 +137,65 @@ export function BottomBar() {
               }}
               className={`flex items-center justify-center w-9 h-9 rounded-xl transition-all ${
                 plusMenuOpen
-                  ? 'bg-slate-900 text-white rotate-45'
+                  ? 'bg-slate-900 text-white'
                   : alertMode
                   ? 'bg-red-100 text-red-500 hover:bg-red-200'
                   : 'bg-gray-100 text-slate-500 hover:bg-gray-200'
               }`}
             >
-              <Plus size={18} />
+              <motion.div
+                animate={{ rotate: plusMenuOpen ? 45 : 0 }}
+                transition={{ duration: 0.2, ease: 'easeInOut' }}
+                style={{ display: 'flex' }}
+              >
+                <Plus size={18} />
+              </motion.div>
             </button>
 
-            {plusMenuOpen && (
-              <div className="absolute bottom-12 left-0 w-56 rounded-2xl border border-gray-200 bg-white shadow-xl shadow-black/8 overflow-hidden page-enter z-30">
-                <div className="px-3 py-2 border-b border-gray-100">
-                  <span className="text-[10px] font-mono uppercase tracking-[0.22em] text-slate-400">
-                    Adjuntar evidencia
-                  </span>
-                </div>
-                <button
-                  onClick={() => {
-                    setPlusMenuOpen(false);
-                    setCameraModalOpen(true);
+            <AnimatePresence>
+              {plusMenuOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  transition={{ duration: 0.25, ease: 'easeOut' }}
+                  className="absolute bottom-12 left-0 w-60 rounded-2xl overflow-hidden z-30"
+                  style={{
+                    border: '1px solid #e5e7eb',
+                    backgroundColor: '#ffffff',
+                    boxShadow: '0 4px 24px rgba(0,0,0,0.08)',
                   }}
-                  className="w-full flex items-center gap-3 px-3 py-3 hover:bg-gray-50 transition-colors"
                 >
-                  <span className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-slate-500">
-                    <Camera size={16} />
-                  </span>
-                  <span className="text-left">
-                    <span className="block text-[13px] text-slate-700 font-medium">Tomar foto</span>
-                    <span className="block text-[11px] text-slate-400">usar cámara ahora</span>
-                  </span>
-                </button>
-                <button
-                  onClick={() => setPlusMenuOpen(false)}
-                  className="w-full flex items-center gap-3 px-3 py-3 hover:bg-gray-50 transition-colors border-t border-gray-100"
-                >
-                  <span className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-slate-500">
-                    <ImagePlus size={16} />
-                  </span>
-                  <span className="text-left">
-                    <span className="block text-[13px] text-slate-700 font-medium">Subir foto</span>
-                    <span className="block text-[11px] text-slate-400">desde galería</span>
-                  </span>
-                </button>
-                <button
-                  onClick={() => setPlusMenuOpen(false)}
-                  className="w-full flex items-center gap-3 px-3 py-3 hover:bg-gray-50 transition-colors border-t border-gray-100"
-                >
-                  <span className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-slate-500">
-                    <FileText size={16} />
-                  </span>
-                  <span className="text-left">
-                    <span className="block text-[13px] text-slate-700 font-medium">Subir documento</span>
-                    <span className="block text-[11px] text-slate-400">pdf, txt, json</span>
-                  </span>
-                </button>
-              </div>
-            )}
+                  <button
+                    onClick={() => {
+                      setPlusMenuOpen(false);
+                      setCameraModalOpen(true);
+                    }}
+                    className="w-full flex items-center gap-3 px-3 py-3 hover:bg-gray-50 transition-colors"
+                  >
+                    <span className="flex items-center justify-center w-9 h-9 rounded-xl bg-[#f3f4f6] text-[#374151] shrink-0">
+                      <Camera size={16} />
+                    </span>
+                    <span className="text-left">
+                      <span className="block text-[15px] font-medium text-[#111827]">Tomar foto</span>
+                      <span className="block text-[13px] text-[#9ca3af]">Analiza lo que tienes frente a ti</span>
+                    </span>
+                  </button>
+                  <button
+                    onClick={() => setPlusMenuOpen(false)}
+                    className="w-full flex items-center gap-3 px-3 py-3 hover:bg-gray-50 transition-colors border-t border-[#e5e7eb]"
+                  >
+                    <span className="flex items-center justify-center w-9 h-9 rounded-xl bg-[#f3f4f6] text-[#374151] shrink-0">
+                      <ImagePlus size={16} />
+                    </span>
+                    <span className="text-left">
+                      <span className="block text-[15px] font-medium text-[#111827]">Subir foto</span>
+                      <span className="block text-[13px] text-[#9ca3af]">Eres libre de poner uno</span>
+                    </span>
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
           {/* Textarea */}

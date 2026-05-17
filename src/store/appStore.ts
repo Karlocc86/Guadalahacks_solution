@@ -18,6 +18,10 @@ interface AppState {
   historyOpen: boolean;
   query: string;
 
+  feedShowResults: boolean;
+  feedResultCardId: string | null;
+  feedSearchQuery: string;
+
   triageIdx: number;
   triagePicks: string[];
 
@@ -34,6 +38,9 @@ interface AppState {
   setRiskLevel: (level: RiskLevel) => void;
   setOffline: (offline: boolean) => void;
   dismissOfflineBanner: () => void;
+
+  showFeedResults: (cardId: string | null, query: string) => void;
+  hideFeedResults: () => void;
 
   setView: (v: AppView) => void;
   openCard: (id: string, severity: CardSeverity) => void;
@@ -78,6 +85,10 @@ const initialState = {
   historyOpen: false,
   query: '',
 
+  feedShowResults: false,
+  feedResultCardId: null as string | null,
+  feedSearchQuery: '',
+
   triageIdx: 0,
   triagePicks: [] as string[],
 
@@ -102,6 +113,11 @@ export const useAppStore = create<AppState>()(
       dismissOfflineBanner: () => set({ isOfflineBannerVisible: false }),
 
       setView: (v) => set({ view: v }),
+
+      showFeedResults: (cardId, query) =>
+        set({ feedShowResults: true, feedResultCardId: cardId, feedSearchQuery: query, plusMenuOpen: false }),
+      hideFeedResults: () =>
+        set({ feedShowResults: false, feedResultCardId: null, feedSearchQuery: '', plusMenuOpen: false }),
 
       // Opens a card from non-category context (home search, history) — clears category state
       openCard: (id, severity) =>

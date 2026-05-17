@@ -66,4 +66,8 @@ export interface Card {
   long: string;
   triage: TriageQuestion[];
   verdict: CardVerdict;
+  indicators?: string[];
+  recovery?: string;
+  suggestions?: Array<{ id: string; title: string }>;
+  meta?: { fuente: string; actualizado: string };
 }
