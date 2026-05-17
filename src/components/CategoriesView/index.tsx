@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { ChevronRight, HeartPulse, Home, CloudLightning, ShieldAlert, MoreHorizontal } from 'lucide-react';
 import { CARDS } from '@lib/cards';
 import { CardIcon } from '@lib/icons';
@@ -102,42 +101,48 @@ function severityBadge(card: Card) {
 }
 
 export function CategoriesView() {
-  const openCard = useAppStore((s) => s.openCard);
-  const [selected, setSelected] = useState<Category | null>(null);
+  const { view, selectedCategoryId, openCategoryDetail, openCardFromCategory } = useAppStore((s) => ({
+    view: s.view,
+    selectedCategoryId: s.selectedCategoryId,
+    openCategoryDetail: s.openCategoryDetail,
+    openCardFromCategory: s.openCardFromCategory,
+  }));
 
-  const categoryCards = selected
-    ? selected.cardIds.map((id) => CARDS.find((c) => c.id === id)).filter(Boolean) as Card[]
-    : [];
+  // Category detail: driven by store view + selectedCategoryId
+  if (view === 'category_detail' && selectedCategoryId !== null) {
+    const selected = CATEGORIES.find((c) => c.id === selectedCategoryId) ?? null;
+    const categoryCards = selected
+      ? (selected.cardIds.map((id) => CARDS.find((c) => c.id === id)).filter(Boolean) as Card[])
+      : [];
 
-  if (selected) {
     return (
       <div className="h-full overflow-y-auto bg-white px-5 pt-4 pb-4 page-enter scroll-pane">
         <p className="text-[10px] font-mono uppercase tracking-[0.28em] text-slate-400">
           Categoría
         </p>
         <h1 className="text-[26px] font-bold tracking-tight text-slate-900 mt-0.5">
-          {selected.name}
+          {selected?.name ?? ''}
         </h1>
-        <p className="text-[13px] text-slate-400 mt-0.5 mb-5">{selected.tags}</p>
+        <p className="text-[13px] text-slate-400 mt-0.5 mb-5">{selected?.tags ?? ''}</p>
 
         {categoryCards.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-center">
-            <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${selected.gradient} flex items-center justify-center mb-4`}>
-              <selected.Icon size={28} className="text-white" strokeWidth={1.5} />
-            </div>
-            <p className="text-[14px] text-slate-400">
-              Próximamente disponible
-            </p>
+            {selected && (
+              <div className={`w-16 h-16 rounded-2xl bg-linear-to-br ${selected.gradient} flex items-center justify-center mb-4`}>
+                <selected.Icon size={28} className="text-white" strokeWidth={1.5} />
+              </div>
+            )}
+            <p className="text-[14px] text-slate-400">Próximamente disponible</p>
           </div>
         ) : (
           <ul className="space-y-3">
             {categoryCards.map((card) => (
               <li key={card.id}>
                 <button
-                  onClick={() => openCard(card.id, card.severity)}
+                  onClick={() => openCardFromCategory(card.id, card.severity)}
                   className="w-full flex items-center gap-3 p-3 rounded-2xl border border-gray-100 bg-white hover:bg-gray-50 transition-colors text-left"
                 >
-                  <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${CARD_GRADIENT[card.id] ?? 'from-gray-300 to-gray-500'} flex items-center justify-center shrink-0`}>
+                  <div className={`w-14 h-14 rounded-xl bg-linear-to-br ${CARD_GRADIENT[card.id] ?? 'from-gray-300 to-gray-500'} flex items-center justify-center shrink-0`}>
                     <CardIcon name={card.icon} size={24} className="text-white" strokeWidth={1.5} />
                   </div>
                   <div className="flex-1 min-w-0">
@@ -160,9 +165,12 @@ export function CategoriesView() {
     );
   }
 
+  // Category list
   return (
     <div className="h-full overflow-y-auto bg-white px-5 pt-4 pb-4 page-enter scroll-pane">
-  
+      <p className="text-[10px] font-mono uppercase tracking-[0.28em] text-slate-400">
+        Explorar
+      </p>
       <h1 className="text-[26px] font-bold tracking-tight text-slate-900 mt-0.5">
         Explorar
       </h1>
@@ -174,10 +182,10 @@ export function CategoriesView() {
         {CATEGORIES.map((cat) => (
           <li key={cat.id}>
             <button
-              onClick={() => setSelected(cat)}
+              onClick={() => openCategoryDetail(cat.id, cat.name)}
               className="w-full flex items-center gap-4 p-3 rounded-2xl border border-gray-100 bg-white hover:bg-gray-50 transition-colors text-left"
             >
-              <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${cat.gradient} flex items-center justify-center shrink-0`}>
+              <div className={`w-14 h-14 rounded-xl bg-linear-to-br ${cat.gradient} flex items-center justify-center shrink-0`}>
                 <cat.Icon size={24} className="text-white" strokeWidth={1.5} />
               </div>
               <div className="flex-1 min-w-0">

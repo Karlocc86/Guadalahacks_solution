@@ -11,6 +11,8 @@ interface AppState {
 
   view: AppView;
   activeCardId: string | null;
+  selectedCategoryId: string | null;
+  selectedCategoryName: string | null;
   alertMode: boolean;
   historyIds: string[];
   historyOpen: boolean;
@@ -35,7 +37,10 @@ interface AppState {
 
   setView: (v: AppView) => void;
   openCard: (id: string, severity: CardSeverity) => void;
+  openCardFromCategory: (id: string, severity: CardSeverity) => void;
   openCategories: () => void;
+  openCategoryDetail: (categoryId: string, categoryName: string) => void;
+  goBack: () => void;
   backToFeed: () => void;
   setAlertMode: (on: boolean) => void;
   setHistoryOpen: (open: boolean) => void;
@@ -66,6 +71,8 @@ const initialState = {
 
   view: 'feed' as AppView,
   activeCardId: null as string | null,
+  selectedCategoryId: null as string | null,
+  selectedCategoryName: null as string | null,
   alertMode: false,
   historyIds: HISTORY_DEFAULT,
   historyOpen: false,
@@ -95,10 +102,27 @@ export const useAppStore = create<AppState>()(
       dismissOfflineBanner: () => set({ isOfflineBannerVisible: false }),
 
       setView: (v) => set({ view: v }),
+
+      // Opens a card from non-category context (home search, history) — clears category state
       openCard: (id, severity) =>
         set((state) => ({
           activeCardId: id,
-          view: 'detail',
+          view: 'detail' as AppView,
+          triageIdx: 0,
+          triagePicks: [],
+          historyOpen: false,
+          plusMenuOpen: false,
+          selectedCategoryId: null,
+          selectedCategoryName: null,
+          alertMode: severity === 'critical' ? true : state.alertMode,
+          historyIds: [id, ...state.historyIds.filter((h) => h !== id)].slice(0, 5),
+        })),
+
+      // Opens a card from within a category — preserves selectedCategoryId for back navigation
+      openCardFromCategory: (id, severity) =>
+        set((state) => ({
+          activeCardId: id,
+          view: 'detail' as AppView,
           triageIdx: 0,
           triagePicks: [],
           historyOpen: false,
@@ -106,8 +130,40 @@ export const useAppStore = create<AppState>()(
           alertMode: severity === 'critical' ? true : state.alertMode,
           historyIds: [id, ...state.historyIds.filter((h) => h !== id)].slice(0, 5),
         })),
-      openCategories: () => set({ view: 'categories', historyOpen: false, plusMenuOpen: false }),
-      backToFeed: () => set({ view: 'feed', activeCardId: null }),
+
+      openCategories: () =>
+        set({
+          view: 'categories',
+          selectedCategoryId: null,
+          selectedCategoryName: null,
+          historyOpen: false,
+          plusMenuOpen: false,
+        }),
+
+      openCategoryDetail: (categoryId, categoryName) =>
+        set({ view: 'category_detail', selectedCategoryId: categoryId, selectedCategoryName: categoryName, historyOpen: false, plusMenuOpen: false }),
+
+      // Smart back: respects the navigation hierarchy
+      goBack: () =>
+        set((state) => {
+          if (state.view === 'detail') {
+            if (state.selectedCategoryId !== null) {
+              return { view: 'category_detail' as AppView, activeCardId: null };
+            }
+            return { view: 'feed' as AppView, activeCardId: null };
+          }
+          if (state.view === 'category_detail') {
+            return { view: 'categories' as AppView, selectedCategoryId: null, selectedCategoryName: null };
+          }
+          if (state.view === 'categories') {
+            return { view: 'feed' as AppView };
+          }
+          return {};
+        }),
+
+      backToFeed: () =>
+        set({ view: 'feed', activeCardId: null, selectedCategoryId: null, selectedCategoryName: null }),
+
       setAlertMode: (on) => set({ alertMode: on }),
       setHistoryOpen: (open) => set({ historyOpen: open }),
       toggleHistoryOpen: () => set((state) => ({ historyOpen: !state.historyOpen })),

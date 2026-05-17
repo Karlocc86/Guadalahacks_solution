@@ -24,7 +24,7 @@ export default function App() {
       <div className="relative flex-1 min-h-0 overflow-hidden">
         {view === 'feed' ? (
           <FeedView />
-        ) : view === 'categories' ? (
+        ) : view === 'categories' || view === 'category_detail' ? (
           <CategoriesView />
         ) : (
           <DetailView />

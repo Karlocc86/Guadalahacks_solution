@@ -15,7 +15,7 @@ export function HeroCard({ card, alert, onOpen }: HeroCardProps) {
     return (
       <button
         onClick={onOpen}
-        className="block w-full text-left relative rounded-2xl border border-red-500/40 bg-gradient-to-br from-red-950/40 to-zinc-950 p-4 overflow-hidden shimmer card-lift"
+        className="block w-full text-left relative rounded-2xl border border-red-500/40 bg-linear-to-br from-red-950/40 to-zinc-950 p-4 overflow-hidden shimmer card-lift"
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -64,7 +64,7 @@ export function HeroCard({ card, alert, onOpen }: HeroCardProps) {
   return (
     <button
       onClick={onOpen}
-      className="block w-full text-left relative rounded-2xl border border-zinc-800 bg-gradient-to-br from-zinc-900 to-zinc-950 p-4 overflow-hidden card-lift"
+      className="block w-full text-left relative rounded-2xl border border-zinc-800 bg-linear-to-br from-zinc-900 to-zinc-950 p-4 overflow-hidden card-lift"
     >
       <div className="flex items-start gap-3">
         <div className="w-[88px] h-[88px] rounded-xl bg-zinc-800/80 border border-zinc-800 flex items-center justify-center flex-shrink-0 relative overflow-hidden">

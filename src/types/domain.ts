@@ -16,7 +16,7 @@ export type UIMode =
   | 'offline'
   | 'emergency';
 
-export type AppView = 'feed' | 'detail' | 'categories';
+export type AppView = 'feed' | 'detail' | 'categories' | 'category_detail';
 
 export type CardSeverity = 'critical' | 'normal';
 

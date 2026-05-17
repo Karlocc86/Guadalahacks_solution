@@ -3,25 +3,47 @@ import { useAppStore } from '@store/appStore';
 import { CARDS } from '@lib/cards';
 import { CardIcon } from '@lib/icons';
 
+function backLabel(
+  view: string,
+  selectedCategoryName: string | null,
+  selectedCategoryId: string | null,
+): string {
+  if (view === 'categories') return 'Inicio';
+  if (view === 'category_detail') return 'Explorar';
+  if (view === 'detail') {
+    if (selectedCategoryId !== null && selectedCategoryName !== null) {
+      return selectedCategoryName.length > 14
+        ? selectedCategoryName.slice(0, 13) + '…'
+        : selectedCategoryName;
+    }
+    return 'Inicio';
+  }
+  return 'Inicio';
+}
+
 export function TopBar() {
   const {
     view,
     alertMode,
     historyOpen,
     historyIds,
+    selectedCategoryId,
+    selectedCategoryName,
     toggleHistoryOpen,
     setPlusMenuOpen,
     openCard,
-    backToFeed,
+    goBack,
   } = useAppStore((s) => ({
     view: s.view,
     alertMode: s.alertMode,
     historyOpen: s.historyOpen,
     historyIds: s.historyIds,
+    selectedCategoryId: s.selectedCategoryId,
+    selectedCategoryName: s.selectedCategoryName,
     toggleHistoryOpen: s.toggleHistoryOpen,
     setPlusMenuOpen: s.setPlusMenuOpen,
     openCard: s.openCard,
-    backToFeed: s.backToFeed,
+    goBack: s.goBack,
   }));
 
   const historyCards = historyIds
@@ -33,7 +55,7 @@ export function TopBar() {
   return (
     <div className="relative z-20 px-4 pt-4 pb-3 flex items-center justify-between shrink-0 border-b border-gray-100 bg-white transition-colors duration-300">
 
-      {/* Left: History icon or Back button */}
+      {/* Left: History icon (feed) or smart Back button (other views) */}
       <div className="relative">
         {view === 'feed' ? (
           <>
@@ -91,11 +113,13 @@ export function TopBar() {
           </>
         ) : (
           <button
-            onClick={backToFeed}
+            onClick={goBack}
             className={`flex items-center gap-1 h-9 px-2 rounded-xl transition-colors ${hoverBg}`}
           >
             <ChevronLeft size={20} className="text-slate-600" />
-            <span className="text-[13px] font-medium text-slate-600">Inicio</span>
+            <span className="text-[13px] font-medium text-slate-600">
+              {backLabel(view, selectedCategoryName, selectedCategoryId)}
+            </span>
           </button>
         )}
       </div>
